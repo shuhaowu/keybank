@@ -1,2 +1,4 @@
-export KEYBANK_PATH="`pwd`/$_"
+umask 0077
+
+export KEYBANK_PATH="$(pwd)/$_"
 export PATH="$KEYBANK_PATH/bin:$PATH"

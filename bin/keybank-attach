@@ -1,0 +1,28 @@
+#!/bin/bash
+
+KEYBANK_PATH=$1
+
+if [ "$(whoami)" != "root" ]; then
+  echo "ERROR: must be root to run this" >&2
+  exit 1
+fi
+
+if [ ! -f $KEYBANK_PATH ]; then
+  echo "ERROR: $KEYBANK_PATH must be a file" >&2
+  exit 1
+fi
+
+mapper_name=`basename $KEYBANK_PATH`
+mnt_path=/mnt/keybank-$mapper_name
+
+set -xe
+
+cryptsetup luksOpen $KEYBANK_PATH $mapper_name
+mkdir -p $mnt_path
+mount /dev/mapper/$mapper_name $mnt_path
+chmod 0700 $mnt_path
+
+set +x
+
+echo
+echo "DONE: Keybank attached at $mnt_path"

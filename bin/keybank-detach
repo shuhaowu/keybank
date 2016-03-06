@@ -1,0 +1,26 @@
+#!/bin/bash
+
+KEYBANK_MOUNT_PATH=/mnt/keybank-$1
+
+if [ "$(whoami)" != "root" ]; then
+  echo "ERROR: must be root to run this" >&2
+  exit 1
+fi
+
+if [ ! -d $KEYBANK_MOUNT_PATH ]; then
+  echo "ERROR: $KEYBANK_MOUNT_PATH is not a directory" >&2
+  exit 1
+fi
+
+mapper_name=$1
+
+set -xe
+
+umount $KEYBANK_MOUNT_PATH
+cryptsetup luksClose $mapper_name
+rmdir $KEYBANK_MOUNT_PATH
+
+set +x
+
+echo
+echo "DONE: Keybank detached"

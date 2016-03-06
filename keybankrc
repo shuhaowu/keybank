@@ -1,0 +1,2 @@
+export KEYBANK_PATH="`pwd`/$_"
+export PATH="$KEYBANK_PATH/bin:$PATH"

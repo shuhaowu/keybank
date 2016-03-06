@@ -17,10 +17,10 @@ mnt_path=/mnt/keybank-$mapper_name
 
 set -xe
 
+umask 0077
 cryptsetup luksOpen $KEYBANK_PATH $mapper_name
 mkdir -p $mnt_path
 mount /dev/mapper/$mapper_name $mnt_path
-chmod 0700 $mnt_path
 
 set +x
 

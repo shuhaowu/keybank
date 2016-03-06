@@ -38,12 +38,6 @@ def try_parsing_arguments():
   )
 
   parser.add_argument(
-    "-f", "--filesystem",
-    default="ext4",
-    help="the file system inside LUKS. default: ext4"
-  )
-
-  parser.add_argument(
     "path",
     help="the path to the keybank file to be created. ensure the parent of this path is owned by root"
   )
@@ -71,6 +65,8 @@ def main():
   if os.geteuid() != 0:
     fatal("must be root to run this.")
 
+  os.umask(077)
+
   args = try_parsing_arguments()
   create_sparse_file(args.path, args.size)
   do_crypt_setup(args.path, args.mount_path)
@@ -82,6 +78,9 @@ def main():
 
   with open("README", "w") as f:
     f.write(KEY_DIRECTORY_README)
+
+  with open("manifest.json", "w") as f:
+    f.write("[]")
 
   execute("git add .")
   execute("git commit -am 'Initial commit'")
@@ -95,8 +94,7 @@ def main():
   print("To go into it, you need to be root.")
   print("")
   print("To unmount, do:")
-  print("# umount {}".format(args.mount_path))
-  print("# cryptsetup luksClose {}".format(os.path.basename(args.mount_path)))
+  print("# keybank-detach {}".format(os.path.basename(args.path)))
 
 
 def create_sparse_file(path, size):
@@ -108,7 +106,7 @@ def create_sparse_file(path, size):
 
 
 def do_crypt_setup(path, mount_path):
-  mapping_name = os.path.basename(mount_path)
+  mapping_name = os.path.basename(path)
   execute("cryptsetup -y luksFormat {}".format(path))
   execute("cryptsetup luksOpen {} {}".format(path, mapping_name))
 
@@ -117,7 +115,9 @@ def do_crypt_setup(path, mount_path):
     fatal("luksOpen executed by {} does not exist".format(mapper_path))
   execute("mkfs.ext4 {}".format(mapper_path))
   execute("mount {} {}".format(mapper_path, mount_path))
-  execute("sudo chmod 0700 {}".format(mount_path))
+  # TODO: shouldn't umask from main work here? Apparently it doesn't on my system?
+  # Needs investigation... Shouldn't have to do this.
+  execute("chmod 0700 {}".format(mount_path))
   return mapper_path
 
 

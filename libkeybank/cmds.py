@@ -155,19 +155,35 @@ class BackupRestore(object):
     validate_dir_or_exit(args.directory_on_machine)
     validate_keybank_attached_or_exit(args.name)
 
+  def run(self, args):
+    kb = KeybankFS(args.name)
+    kb.scan()
+    for ttype, files in kb.files.items():
+      method = getattr(files, self.method)
+      method(args.directory_on_machine, args.dry_run)
+
 
 class Backup(BackupRestore):
   description = "backs up to an attached keybank"
+  method = "backup"
 
   def run(self, args):
-    pass
+    BackupRestore.run(self, args)
+    logger = logging.getLogger()
+    if not args.dry_run:
+      logger.info("backup complete")
+      logger.info("remember to do `git commit` after you examine the changes")
 
 
 class Restore(BackupRestore):
   description = "restores from an attached keybank"
+  method = "restore"
 
   def run(self, args):
-    pass
+    BackupRestore.run(self, args)
+    logger = logging.getLogger()
+    if not args.dry_run:
+      logger.info("restore complete")
 
 
 class Verify(object):
@@ -180,7 +196,15 @@ class Verify(object):
     validate_keybank_attached_or_exit(args.name)
 
   def run(self, args):
-    pass
+    logger = logging.getLogger()
+
+    kb = KeybankFS(args.name)
+    kb.scan()
+    for ttype, files in kb.files.items():
+      if files.verify():
+        fatal("verification failed, see messages above for details")
+
+    logger.info("verification successful")
 
 
 commands = [

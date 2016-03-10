@@ -57,6 +57,6 @@ def hash_file(path, chunk_size=2**20):
       buf = f.read(chunk_size)
       if not buf:
         break
-      h.update(buf)
+      h.update(buf.encode("utf-8"))
 
   return h.hexdigest()

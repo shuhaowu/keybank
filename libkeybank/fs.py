@@ -71,15 +71,9 @@ class KeybankFS(object):
   def _initialize_directory_structure(self):
     self.logger.info("initializing keybank directory structure")
     with chdir(self.mnt_path):
-      os.mkdir("generic")
-      os.mkdir("gpg")
-      os.chdir(os.path.join(self.mnt_path, "generic"))
-      execute("git init")
-      with open("manifest.json", "w") as f:
-        f.write("[]")
-
-      execute("git add .")
-      execute("git commit -am 'Initializing keybank generic'")
+      # TODO: make this modular
+      GenericFiles.initialize_directory_structure(self.mnt_path)
+      GPGFiles.initialize_directory_structure(self.mnt_path)
 
   def _create(self, size):
     create_sparse_file(self.path, size)

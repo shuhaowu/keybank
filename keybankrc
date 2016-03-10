@@ -1,4 +1,0 @@
-export KEYBANK_PATH="$(dirname $(realpath $_))"
-export PATH="$KEYBANK_PATH/bin:$PATH"
-
-umask 0077

@@ -2,7 +2,7 @@ from __future__ import absolute_import, print_function
 
 import os
 
-from ..helpers import KeybankTestCase, command_executor, KeybankInfo
+from ..helpers import KeybankTestCase, KeybankInfo
 
 from libkeybank.fs import KeybankFS
 

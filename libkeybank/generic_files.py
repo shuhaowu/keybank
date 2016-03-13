@@ -75,8 +75,8 @@ class GenericFiles(object):
   def verify(self):
     self.logger.info("verifying files")
     if not self.locked_manifest:
-      self.logger.warn("empty or no manifest.json.lock file found, skipping generic files verification")
-      self.logger.warn("this could be because the backup was not initialize or nothing is in the backup")
+      self.logger.warning("empty or no manifest.json.lock file found, skipping generic files verification")
+      self.logger.warning("this could be because the backup was not initialize or nothing is in the backup")
       return True
 
     all_file_hashes = self.hash_all_files(self.path)
@@ -87,7 +87,7 @@ class GenericFiles(object):
       expected_hash = expected_hashes.pop(fn, None)
       if actual_hash != expected_hash:
         if expected_hash is None:
-          self.logger.warn("detected file not by tracked manifest: {}".format(fn))
+          self.logger.warning("detected file not by tracked manifest: {}".format(fn))
         else:  # impossible right now for actual_hash to be None
           different_hashes[fn] = FailedHashExpectation(expected=expected_hash, actual=actual_hash)
           self.logger.error("difference detected for {}: {} (expected) != {} (actual)".format(fn, expected_hash, actual_hash))
@@ -149,8 +149,8 @@ class GenericFiles(object):
   def restore(self, to_directory, dry_run):
     self.logger.info("restoring generic files")
     if not self.locked_manifest:
-      self.logger.warn("empty or no manifest.json.lock file found, skipping generic files restore")
-      self.logger.warn("this could be because the backup was not initialize or nothing is in the backup")
+      self.logger.warning("empty or no manifest.json.lock file found, skipping generic files restore")
+      self.logger.warning("this could be because the backup was not initialize or nothing is in the backup")
       return True
 
     for path, data in self.locked_manifest.items():

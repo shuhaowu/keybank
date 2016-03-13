@@ -1,6 +1,8 @@
 Keybank
 =======
 
+[![Build Status](https://travis-ci.org/shuhaowu/keybank.svg?branch=master)](https://travis-ci.org/shuhaowu/keybank)
+
 A set of tools and scripts that lives on an USB drive to manage keys
 stored on this device.
 
@@ -24,7 +26,7 @@ Tain tools are available:
 
 Current Status: not really ready, things missing below
 
-- [ ] tests (travis CI)
+- [x] tests (travis CI)
 - [ ] GPG restorer
 - [ ] use git to verify files as well as history
 - [ ] investigate into seeing if the verification is sufficient (currently hash them and compare against recorded version)

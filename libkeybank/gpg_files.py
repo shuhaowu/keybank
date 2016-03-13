@@ -29,24 +29,24 @@ class GPGFiles(object):
 
   @contextmanager
   def _attention_banner(self):
-    self.logger.warn("")
-    self.logger.warn("=========")
-    self.logger.warn("ATTENTION")
-    self.logger.warn("=========")
-    self.logger.warn("")
+    self.logger.warning("")
+    self.logger.warning("=========")
+    self.logger.warning("ATTENTION")
+    self.logger.warning("=========")
+    self.logger.warning("")
     yield
-    self.logger.warn("")
-    self.logger.warn("=========")
-    self.logger.warn("ATTENTION")
-    self.logger.warn("=========")
-    self.logger.warn("")
+    self.logger.warning("")
+    self.logger.warning("=========")
+    self.logger.warning("ATTENTION")
+    self.logger.warning("=========")
+    self.logger.warning("")
 
   def backup(self, from_directory, dry_run):
     with self._attention_banner():
-      self.logger.warn("gpg backend does not support backups... skipping")
+      self.logger.warning("gpg backend does not support backups... skipping")
 
   def restore(self, to_directory, dry_run):
     with self._attention_banner():
-      self.logger.warn("gpg backend does not support restore to your machine.")
-      self.logger.warn("it will restore inside the keybank, under the gpg/_export directory.")
-      self.logger.warn("you will need to copy it manually for now.")
+      self.logger.warning("gpg backend does not support restore to your machine.")
+      self.logger.warning("it will restore inside the keybank, under the gpg/_export directory.")
+      self.logger.warning("you will need to copy it manually for now.")

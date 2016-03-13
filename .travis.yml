@@ -1,0 +1,11 @@
+language: python
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+
+sudo: required
+
+install: "bash ./scripts/travis_setup.sh"
+script: sudo python -m unittest discover
+

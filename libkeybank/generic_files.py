@@ -73,7 +73,7 @@ class GenericFiles(object):
     return hashes
 
   def verify(self):
-    self.logger.info("verifying files")
+    self.logger.info("verifying generic files")
     if not self.locked_manifest:
       self.logger.warning("empty or no manifest.json.lock file found, skipping generic files verification")
       self.logger.warning("this could be because the backup was not initialize or nothing is in the backup")

@@ -24,12 +24,14 @@ Tain tools are available:
 3. Verifying the keybank.
 4. Exporting GPG home directory without the master key for usage.
 
-Current Status: not really ready, things missing below
+Current Status: somewhat ready to use, interface might need to change. 
 
-- [x] tests (travis CI)
-- [ ] GPG restorer
+A list of things that will push this production quality: 
+
+- [ ] more comprehensive tests
 - [ ] use git to verify files as well as history
 - [ ] investigate into seeing if the verification is sufficient (currently hash them and compare against recorded version)
+- [ ] investigate into gpg restoring directly instead of using a wrapper script
 - [ ] make the system more modular so we can have more backends 
 
 

@@ -18,12 +18,14 @@ def fatal(message):
   sys.exit(1)
 
 
-def execute(command, logger=None):
+def execute(command, logger=None, raises=True):
   logger = logger or logging.getLogger()
   logger.info("EXECUTING: {}".format(command))
   status = os.system(command)
-  if status != 0:
+  if raises and status != 0:
     raise SystemExecuteError("exeucting `{}` failed with status {}".format(command, status))
+  else:
+    return status
 
 
 def quiet_call(command):

@@ -16,22 +16,24 @@ class CommandExecutorWithStdinSupport(object):
   def register_command(self, command, stdin):
     self.registered_commands[command] = stdin
 
-  def _execute(self, command, logger=None):
+  def _execute(self, command, logger=None, raises=True):
     self.logs.append(command)
 
     if command in self.registered_commands:
       p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
       stdout_data, stderr_data = p.communicate(input=self.registered_commands[command].encode("utf-8"))
 
-      if p.returncode != 0:
+      if raises and p.returncode != 0:
         print(command)
         print("STDOUT:", stdout_data)
         print("STDERR:", stderr_data)
         raise RuntimeError("{} failed with {}".format(command, p.returncode))
+      else:
+        return p.returncode
 
-      return
+      return p.returncode
 
-    _original_execute(command, logger)
+    _original_execute(command, logger, raises)
 
   def clear(self):
     self.logs = []

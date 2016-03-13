@@ -58,7 +58,7 @@ class KeybankFS(object):
 
   def _setup_luks_and_fs(self):
     self.logger.info("setting up LUKS on keybank file")
-    execute("cryptsetup -y luksFormat {}".format(self.path))
+    execute("cryptsetup luksFormat {}".format(self.path))
     execute("cryptsetup luksOpen {} {}".format(self.path, self.name))
     execute("mkfs.ext4 {}".format(self.mapper_path))
     mkdir_p(self.mnt_path)

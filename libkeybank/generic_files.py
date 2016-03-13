@@ -17,7 +17,7 @@ FailedHashExpectation = namedtuple("FailedHashExpectation", ["expected", "actual
 
 class GenericFiles(object):
   @staticmethod
-  def initialize_directory_structure(self, keybank_partition_path):
+  def initialize_directory_structure(keybank_partition_path):
     os.mkdir("generic")
     generic_path = os.path.join(keybank_partition_path, "generic")
     os.chdir(generic_path)

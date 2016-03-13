@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -xe
+sudo python --version
+sudo python -m unittest discover
+
+sudo python3 --version
+sudo python3 -m unittest discover

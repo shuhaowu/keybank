@@ -140,6 +140,12 @@ class BackupRestore(object):
     )
 
     parser.add_argument(
+      "--include-gpg",
+      action="store_true",
+      help="if enabled, this will attempt to backup/restore gpg files"
+    )
+
+    parser.add_argument(
       "name",
       help="the name of the keybank (just the filename of your keybank file). this must already be attached."
     )
@@ -159,6 +165,9 @@ class BackupRestore(object):
     kb = KeybankFS(args.name)
     kb.scan()
     for ttype, files in kb.files.items():
+      if ttype == "gpg" and not args.include_gpg:
+        continue
+
       method = getattr(files, self.method)
       method(args.directory_on_machine, args.dry_run)
 

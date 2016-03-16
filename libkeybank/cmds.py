@@ -93,6 +93,7 @@ class Create(object):
     parser.add_argument(
       "-s", "--size", nargs="?",
       default=128*1024*1024,  # 128MB
+      type=int,
       help="the size of the keybank in bytes (defaults to 128MB)"
     )
 

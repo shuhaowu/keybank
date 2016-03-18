@@ -54,11 +54,11 @@ def mkdir_p(path):
 
 def hash_file(path, chunk_size=2**20):
   h = hashlib.sha256()
-  with open(path) as f:
+  with open(path, "rb") as f:
     while True:
       buf = f.read(chunk_size)
       if not buf:
         break
-      h.update(buf.encode("utf-8"))
+      h.update(buf)
 
   return h.hexdigest()

@@ -28,6 +28,7 @@ Current Status: somewhat ready to use, interface might need to change.
 
 A list of things that will push this production quality: 
 
+- [ ] Refactor of backends to support archival (cold storage), generic files per compute, gpg (with restore)
 - [ ] more comprehensive tests
 - [ ] use git to verify files as well as history
 - [ ] investigate into seeing if the verification is sufficient (currently hash them and compare against recorded version)

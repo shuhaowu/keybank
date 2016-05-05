@@ -18,9 +18,33 @@ def fatal(message):
   sys.exit(1)
 
 
-def execute(command, logger=None, raises=True):
+def execute_without_interactive(command, logger=None, raises=True):
   logger = logger or logging.getLogger()
-  logger.info("EXECUTING: {}".format(command))
+  logger.debug("EXECUTING: {}".format(command))
+  p = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+  p.stdin.close()
+  retcode = p.wait()
+  if raises and retcode != 0:
+    print(p.stdout.read().decode("utf-8"), file=sys.stderr)
+    p.stdout.close()
+    raise SystemExecuteError("exeucting `{}` failed with status {}".format(command, retcode))
+
+  p.stdout.close()
+  return p
+
+
+@contextmanager
+def execute_with_postprocessing(command, logger=None):
+  p = execute_without_interactive(command, logger, raises=False)
+  try:
+    yield p
+  finally:
+    p.stdout.close()
+
+
+def execute_with_interactive(command, logger=None, raises=True):
+  logger = logger or logging.getLogger()
+  logger.debug("EXECUTING: {}".format(command))
   status = os.system(command)
   if raises and status != 0:
     raise SystemExecuteError("exeucting `{}` failed with status {}".format(command, status))

@@ -59,7 +59,7 @@ class BaseStore(object):
     self.logger.debug("no restore action is defined for this store.")
 
   def _gitcommit(self, msg="update"):
-    self.repo.commit(msg, self.get_author())
+    self.repo.commit_all(msg, self.get_author())
 
   def detect_file_changes(self):
     if self.repo is None:

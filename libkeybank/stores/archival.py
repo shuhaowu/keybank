@@ -14,7 +14,7 @@ class ArchivalStore(BaseStore):
   @classmethod
   def create_initial_files(cls):
     with open("manifest.lock.json", "w") as f:
-      f.write("{}".encode("utf-8"))
+      f.write("{}")
 
   def verify(self):
     status = VerificationStatus(self)

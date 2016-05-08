@@ -7,5 +7,5 @@ python:
 sudo: required
 
 install: "bash ./scripts/travis_setup.sh"
-script: sudo python -m unittest discover
+script: sudo python3 -m unittest discover
 

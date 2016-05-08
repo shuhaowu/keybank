@@ -18,7 +18,7 @@ def fatal(message):
   sys.exit(1)
 
 
-def execute_without_interactive(command, logger=None, raises=True):
+def execute_without_interactive(command, logger=None, raises=True, closes=True):
   logger = logger or logging.getLogger()
   logger.debug("EXECUTING: {}".format(command))
   p = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -29,13 +29,15 @@ def execute_without_interactive(command, logger=None, raises=True):
     p.stdout.close()
     raise SystemExecuteError("exeucting `{}` failed with status {}".format(command, retcode))
 
-  p.stdout.close()
+  if closes:
+    p.stdout.close()
+
   return p
 
 
 @contextmanager
 def execute_with_postprocessing(command, logger=None):
-  p = execute_without_interactive(command, logger, raises=False)
+  p = execute_without_interactive(command, logger, raises=False, closes=False)
   try:
     yield p
   finally:

@@ -7,12 +7,14 @@ from .utils import execute_without_interactive, chdir, execute_with_postprocessi
 
 # From the Extracted Diagnostics section of the git-fsck man page.
 FSCK_ERROR_MESSAGES = (
+  "error",
   "lack of head",
   "missing sha",
   "unreachable",
   "missing",
   "dangling",
-  "mismatch"
+  "mismatch",
+  "invalid",
 )
 
 
@@ -47,6 +49,7 @@ class Repo(object):
     with chdir(self.path):
       with execute_with_postprocessing("git fsck", logger=self.logger) as p:
         messages = p.stdout.read().decode("utf-8")
+        p.stdout.close()
         if p.returncode != 0:
           return False, messages
 

@@ -54,7 +54,7 @@ class GitliteTest(unittest.TestCase):
     for path in corrupted_repos:
       repo = Repo(path)
       good, message = repo.fsck()
-      self.assertFalse(good)
+      self.assertFalse(good, "{} is not supposed to be good".format(path))
 
     # total hack to not commit it again
     self.test_commit_all()
@@ -63,7 +63,6 @@ class GitliteTest(unittest.TestCase):
     repo = Repo(repo_path)
     good, message = repo.fsck()
     self.assertTrue(good)
-
 
   def tearDown(self):
     shutil.rmtree(self.basepath)

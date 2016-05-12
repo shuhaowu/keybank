@@ -9,7 +9,7 @@ from ..utils import chdir
 class ArchivalStore(BaseStore):
   DIRECTORY_NAME = "archival"
 
-  EXCLUDED_FILES = {".git", "manifest.lock.json"}
+  EXCLUDED_FILES = {".git", "/manifest.lock.json"}
 
   @classmethod
   def create_initial_files(cls):
@@ -18,10 +18,6 @@ class ArchivalStore(BaseStore):
 
   def verify(self):
     status = VerificationStatus(self)
-
-    status.uncommited_changes = self.has_uncommited_changes()
-    if status.uncommited_changes:
-      return status
 
     status.git_repo_status, status.git_repo_error_messages = self.repo.fsck()
 

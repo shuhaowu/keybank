@@ -71,20 +71,21 @@ class BaseStore(object):
       "deleted": set(),
     }
 
-    files = [(s[:2], s[2:]) for s in self.repo.git.status(porcelain=True).split("\n")]
+    files = [(s[:2], s[2:]) for s in self.repo.status().split("\n")]
     # See git status porcelain format for details
     for status, path in files:
+      path = path.strip()
       if not path.startswith("/"):
         path = "/" + path
 
       if status == "??":
         changes["added"].add(path)
       elif status == " M":
-        changes["modified"].add(path)
+        changes["changed"].add(path)
       elif status == " D":
         changes["deleted"].add(path)
       else:
-        raise RuntimeError("please do not use git directly. this will cause issues, use keybank commit instead. (run git status on your stores to diagnose)")
+        raise RuntimeError("please do not use git directly. this will cause issues, use keybank commit instead: {}".format(files))
 
     return changes
 
@@ -127,8 +128,6 @@ class VerificationStatus(object):
   def __init__(self, store):
     self.store = store
 
-    self.uncommited_changes = False
-
     self.git_repo_status = None
     self.git_repo_error_messages = None
 
@@ -142,4 +141,4 @@ class VerificationStatus(object):
     return self.uncommited_changes
 
   def is_good(self):
-    return (not self.uncommited_changes) and self.git_repo_status and self.files_overall_status and self.other_status
+    return self.git_repo_status and self.files_overall_status and self.other_status

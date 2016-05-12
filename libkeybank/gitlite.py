@@ -49,7 +49,6 @@ class Repo(object):
     with chdir(self.path):
       with execute_with_postprocessing("git fsck", logger=self.logger) as p:
         messages = p.stdout.read().decode("utf-8")
-        p.stdout.close()
         if p.returncode != 0:
           return False, messages
 
@@ -59,3 +58,8 @@ class Repo(object):
           return False, messages
 
     return True, ""
+
+  def status(self):
+    with chdir(self.path):
+      with execute_with_postprocessing("git status --porcelain", logger=self.logger) as p:
+        return p.stdout.read().decode("utf-8").rstrip()

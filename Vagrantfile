@@ -4,7 +4,7 @@
 $script = <<SCRIPT
 # General setup
 apt-get install -y git python3 python3-pip python3-dev language-pack-en
-pip3 install -r /vagrant/requirements.txt
+git 
 SCRIPT
 
 Vagrant.configure(2) do |config|

@@ -24,25 +24,30 @@ class SynchronizedStore(BaseStore):
     super(self.__class__, self).__init__(path)
     self.manifests = {}
 
-    filenames = os.listdir(path)
+    for fn in self.manifest_files():
+      name = fn[:-14]
+      with open(fn) as f:
+        self.manifests[name] = json.load(f)
 
+  def manifest_files(self):
+    filenames = os.listdir(path)
     for fn in filenames:
       if fn.endswith(".manifest.json"):
-        name = fn[:-14]
-        with open(fn) as f:
-          self.manifests[name] = json.load(f)
+        yield fn
+
+  def excluded_files(self):
+    excluded_files = list(self.manifest_files())
+    excluded_files.append(".git")
+    return excluded_files
 
   def verify(self):
-    raise NotImplementedError
+    return self.verify_against_locked_manifest(self.excluded_files())
 
   def commit(self, dry_run=False):
-    self.logger.warn("no commit is defined for this as backup is defined instead")
-    raise NotImplementedError
+    return self.lock_and_gitcommit(self.excluded_files(), dry_run=dry_run)
 
   def backup(self, config, dry_run=False):
     self.logger.info("backing up common synchronized storage")
-
-    # TODO: we should commit here as well...
 
     files_backed_up = set()
     files_backed_up |= self._backup_one_machine("_common", config, dry_run=dry_run)

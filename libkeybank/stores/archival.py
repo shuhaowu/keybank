@@ -66,7 +66,7 @@ class ArchivalStore(BaseStore):
     current_manifest = self.compute_file_hashes(excludes=self.EXCLUDED_FILES)
     with chdir(self.path):
       with open("manifest.lock.json", "w") as f:
-        json.dump(current_manifest, f)
+        json.dump(current_manifest, f, sort_keys=True, indent=4, separators=(",", ": "))
 
     self._gitcommit()
     self.logger.info("committed.")

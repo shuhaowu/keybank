@@ -55,7 +55,7 @@ Directory Structure
         home/user/.config/sensitive_file_for_machine_1
       machine2
         home/user/.config/sensitive_file_for_machine_2
-      all.manifest.json
+      _common.manifest.json
       machine1.manifest.json
       machine2.manifest.json
       manifest.lock.json

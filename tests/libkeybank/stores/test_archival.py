@@ -104,12 +104,18 @@ class TestArchivalStore(unittest.TestCase):
     self.assertFalse(status.files_overall_status)
     self.assertEqual("removed", status.files_errors["/testfile"])
 
-    d = random.choice(os.listdir(os.path.join(".git", "objects")))
-    shutil.rmtree(os.path.join(".git", "objects", d))
+    while True:
+      d = random.choice(os.listdir(os.path.join(".git", "objects")))
+      d = os.path.join(".git", "objects", d)
+      stuff = os.listdir(d)
+      if len(stuff) > 0:  # delete a directory with things inside...
+        break
+
+    shutil.rmtree(d)
 
     status = self.store.verify()
     self.assertFalse(status.is_good())
-    self.assertFalse(status.git_repo_status)
+    self.assertFalse(status.git_repo_status, "deleted {} (contains {}) but git repo is still intact?".format(d, stuff))
     self.assertFalse(status.files_overall_status)
     self.assertEqual("removed", status.files_errors["/testfile"])
 

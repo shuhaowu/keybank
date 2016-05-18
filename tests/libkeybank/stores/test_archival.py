@@ -1,23 +1,18 @@
 from __future__ import absolute_import, print_function
 
-import unittest
 import json
 import os
 import random
 import shutil
-import tempfile
 
 from libkeybank.stores.archival import ArchivalStore
 from libkeybank.utils import execute_with_postprocessing
 
+from .helpers import StoreTestCase
 
-class TestArchivalStore(unittest.TestCase):
-  def setUp(self):
-    self.base_path = tempfile.mkdtemp(prefix="test-fake-kb-archival-store")
-    self.store = ArchivalStore.initialize_directory_structure(self.base_path)
-    self.store_path = os.path.join(self.base_path, ArchivalStore.DIRECTORY_NAME)
-    self.previous_pwd = os.getcwd()
-    os.chdir(self.store_path)
+
+class TestArchivalStore(StoreTestCase):
+  store_cls = ArchivalStore
 
   def test_setup_has_locked_manifest_and_git(self):
     self.assertTrue(os.path.isdir(".git"))
@@ -128,7 +123,3 @@ class TestArchivalStore(unittest.TestCase):
     with execute_with_postprocessing("git log --pretty=oneline --no-color") as p:
       commits = p.stdout.read().decode("utf-8").strip().split("\n")
       self.assertEqual(n, len(commits))
-
-  def tearDown(self):
-    shutil.rmtree(self.base_path)
-    os.chdir(self.previous_pwd)

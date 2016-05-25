@@ -1,102 +1,77 @@
 from __future__ import absolute_import, print_function
 
-import glob
-import json
 import os
-# from pwd import getpwuid, getpwnam
-# from grp import getgrgid, getgrnam
-import shutil
+import json
 
 from .base import BaseStore, VerificationStatus
-from ..utils import chdir, hash_file, mkdir_p
+from ..utils import chdir
 
 
 class SynchronizedStore(BaseStore):
   @classmethod
   def create_initial_files(cls):
-    with open("_common.manifest.json", "w") as f:
-      f.write("{}")
+    if not os.path.exists("_common.manifest.json"):
+      with open("_common.manifest.json", "w") as f:
+        f.write("{}")
 
-    with open("manifest.lock.json", "w") as f:
-      f.write("{}")
+    if not os.path.exists("_common.manifest.lock.json"):
+      with open("_common.manifest.lock.json", "w") as f:
+        f.write("{}")
 
   def __init__(self, path):
     super(self.__class__, self).__init__(path)
-    self.manifests = {}
 
-    for fn in self.manifest_files():
-      name = fn[:-14]
+    self.manifests = {}
+    for name, fn in self._manifest_files():
       with open(fn) as f:
         self.manifests[name] = json.load(f)
 
-  def manifest_files(self):
-    filenames = os.listdir(path)
+  def _manifest_files(self):
+    filenames = os.listdir(self.path)
     for fn in filenames:
       if fn.endswith(".manifest.json"):
-        yield fn
+        name = fn[:-14]
+        yield name, fn
 
-  def excluded_files(self):
-    excluded_files = list(self.manifest_files())
+  def write_manifest_lock(self, config):
+    manifest_locks = {}
+    for name, fn in self._manifest_files():
+      # Subfolders have no ignored files in theory.
+      manifest_lock = self._compute_file_hashes_for_path(path=os.path.join(self.path, name), excludes=[])
+      with chdir(self.path):
+        with open("{}.manifest.lock.json", "w") as f:
+          json.dump(manifest_lock, f, sort_keys=True, indent=4, separators=(",", ": "))
+
+      manifest_locks[name] = manifest_lock
+
+    return manifest_locks
+
+  def exclude_files(self):
+    names = map(lambda v: v[0], self.manifest_files())
+    excluded_files = []
+    for name in names:
+      excluded_files.append("{}.manifest.json")
+      excluded_files.append("{}.manifest.lock.json")
+
     excluded_files.append(".git")
     return excluded_files
 
+  def backup(self, config):
+    pass
+
+  def restore(self, config):
+    pass
+
   def verify(self):
-    return self.verify_against_locked_manifest(self.excluded_files())
+    status = VerificationStatus(self)
 
-  def commit(self, dry_run=False):
-    return self.lock_and_gitcommit(self.excluded_files(), dry_run=dry_run)
+    self._verify_git_repo(status)
 
-  def backup(self, config, dry_run=False):
-    self.logger.info("backing up common synchronized storage")
+    for name, fn in self._manifest_files:
+      self._verify_against_manifest_lock(status,
+                                         manifest_lock_path=os.path.join(self.path, "{}.manifest.lock.json".format(name)),
+                                         root_path=os.path.join(self.path, name),
+                                         path_prefix="/{}".format(name),
+                                         excludes=self.excluded_files())
 
-    files_backed_up = set()
-    files_backed_up |= self._backup_one_machine("_common", config, dry_run=dry_run)
-
-    if config.get("machine"):
-      self.logger.info("backing up %s synchronized storage", config["machine"])
-      files_backed_up |= self._backup_one_machine(config["machine"], config, dry_run=dry_run)
-
-    locked_manifests = self.get_locked_manifest()
-    for machine, locked_manifest in locked_manifests.items():
-      for path in locked_manifests:
-        if path not in files_backed_up:
-          self.logger.info("{} is on file system but not tracked by manifest, deleting...".format(fn))
-          if not dry_run:
-            os.remove(os.path.join(self.path, path.lstrip("/")))
-
-    # TODO: what should we return here?
-
-  def restore(self, config, dry_run=False):
-    self.logger.debug("no restore action is defined for this store.")
-
-  def get_locked_manifest(self):
-    with open("manifest.lock.json") as f:
-      return json.load(f)
-
-  def _backup_one_machine(self, machine, config, dry_run=False):
-    files_backed_up = set()
-    for entry in self.manifests[machine]:
-      paths = self.expand_path(entry["path"], base=config["from_directory"])
-      if len(paths) != entry["amount"]:
-        raise RuntimeError("expected {} files for {} but got {}: {}".format(entry["amount"], entry["path"], len(paths), paths))
-
-      for from_path in paths:
-        relative_absolute_path = self.get_relative_absolute_path(from_path, config["from_directory"])
-        files_backed_up.add(relative_absolute_path)
-        to_path = relative_absolute_path.lstrip("/")
-        to_path = os.path.join(self.path, to_path)
-        self.logger.info("copying {} to {}".format(from_path, to_path))
-
-        if not dry_run:
-          dirname = os.path.dirname(to_path)
-          mkdir_p(dirname)
-          shutil.copy2(from_path, to_path)
-          os.chown(to_path, 0, 0)
-          os.chmod(to_path, int("0600", 8))
-
-    return files_backed_up
-
-  def expand_path(self, path, base="/"):
-    path = path.lstrip("/")
-    path = os.path.join(base, path)
-    return glob.glob(os.path.expanduser(path))
+    return status

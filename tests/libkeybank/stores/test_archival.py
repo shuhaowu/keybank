@@ -28,16 +28,7 @@ class TestArchivalStore(StoreTestCase):
     with open("testfile", "w") as f:
       f.write("hello world")
 
-    files_changed = self.store.commit(dry_run=True)
-    self.assertEqual(0, len(files_changed["changed"]))
-    self.assertEqual(0, len(files_changed["deleted"]))
-    self.assertEqual(1, len(files_changed["added"]))
-    self.assertEqual({"/testfile"}, files_changed["added"])
-
-    self.assert_manifest_lock_json_is({})
-    self.assert_number_of_commit_equals(1)
-
-    self.store.commit()
+    self.store.commit(config=None)
     self.assert_manifest_lock_json_is({"/testfile": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"})
     self.assert_number_of_commit_equals(2)
 
@@ -46,31 +37,14 @@ class TestArchivalStore(StoreTestCase):
     with open("testfile", "w") as f:
       f.write("jello world")
 
-    files_changed = self.store.commit(dry_run=True)
-    self.assertEqual(1, len(files_changed["changed"]))
-    self.assertEqual(0, len(files_changed["deleted"]))
-    self.assertEqual(0, len(files_changed["added"]))
-    self.assertEqual({"/testfile"}, files_changed["changed"])
-
-    self.assert_manifest_lock_json_is({"/testfile": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"})
-    self.assert_number_of_commit_equals(2)
-
-    self.store.commit()
+    self.store.commit(config=None)
     self.assert_manifest_lock_json_is({"/testfile": "cf1b2b8bccc960a8ffd092ca60843c35e8be79b42ab083f55c9e7375d46f2151"})
     self.assert_number_of_commit_equals(3)
 
     # delete file
     os.unlink("testfile")
-    files_changed = self.store.commit(dry_run=True)
-    self.assertEqual(0, len(files_changed["changed"]))
-    self.assertEqual(1, len(files_changed["deleted"]))
-    self.assertEqual(0, len(files_changed["added"]))
-    self.assertEqual({"/testfile"}, files_changed["deleted"])
 
-    self.assert_manifest_lock_json_is({"/testfile": "cf1b2b8bccc960a8ffd092ca60843c35e8be79b42ab083f55c9e7375d46f2151"})
-    self.assert_number_of_commit_equals(3)
-
-    self.store.commit()
+    self.store.commit(config=None)
     self.assert_manifest_lock_json_is({})
     self.assert_number_of_commit_equals(4)
 
@@ -78,7 +52,7 @@ class TestArchivalStore(StoreTestCase):
     with open("testfile", "w") as f:
       f.write("hello world")
 
-    self.store.commit()
+    self.store.commit(config=None)
 
     status = self.store.verify()
     self.assertTrue(status.is_good())

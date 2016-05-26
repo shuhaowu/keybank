@@ -21,10 +21,13 @@ class BaseStore(object):
   DIRECTORY_NAME = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
 
   @classmethod
-  def initialize_directory_structure(cls, keybank_mount_path):
-    with chdir(keybank_mount_path):
-      os.mkdir(cls.DIRECTORY_NAME)
-      path = os.path.join(keybank_mount_path, cls.DIRECTORY_NAME)
+  def initialize_directory_structure(cls, base_path, directory_name=None):
+    if directory_name is None:
+      directory_name = cls.DIRECTORY_NAME
+
+    with chdir(base_path):
+      os.mkdir(directory_name)
+      path = os.path.join(base_path, directory_name)
       with chdir(path):
         cls.create_initial_files()
 

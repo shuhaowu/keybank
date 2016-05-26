@@ -49,15 +49,15 @@ class TestSynchronizedStore(StoreTestCase):
     self.common_manifest = {
       "files": [
         {
-          "entry": "/file1",
+          "path": "/file1",
           "amount": 1,
         },
         {
-          "entry": "/.dir1/*",
+          "path": "/.dir1/*",
           "amount": 2,
         },
         {
-          "entry": "/.dir2/**/*",
+          "path": "/.dir2/**/*",
           "amount": 2,
         },
       ],
@@ -69,7 +69,7 @@ class TestSynchronizedStore(StoreTestCase):
     self.machine1_manifest = {
       "files": [
         {
-          "entry": "/machine1/file1",
+          "path": "/machine1/file1",
           "amount": 1,
         },
       ],
@@ -81,7 +81,7 @@ class TestSynchronizedStore(StoreTestCase):
     self.machine2_manifest = {
       "files": [
         {
-          "entry": "/machine2/file1",
+          "path": "/machine2/file1",
           "amount": 1,
         },
       ],

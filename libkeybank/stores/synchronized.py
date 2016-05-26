@@ -2,9 +2,11 @@ from __future__ import absolute_import, print_function
 
 import os
 import json
+import glob
+import shutil
 
 from .base import BaseStore, VerificationStatus
-from ..utils import chdir
+from ..utils import chdir, mkdir_p
 
 
 class SynchronizedStore(BaseStore):
@@ -33,6 +35,39 @@ class SynchronizedStore(BaseStore):
         name = fn[:-14]
         yield name, fn
 
+  def _expand_path(self, path, base="/"):
+    path = path.lstrip("/")
+    path = path.join(base, path)
+    return glob.glob(os.path.expanduser(path))
+
+  def _backup_one_machine(self, machine):
+    self.logger.info("backuping up {}".format(machine))
+    if machine not in self.manifests:
+      raise ValueError("{} is not a valid machine".format(machine))
+
+    # Sanity check the environment
+    errored = False
+    all_paths = []
+    for entry in self.manifests[machine]["files"]:
+      paths = self._expand_path(entry["path"], base=self.manifests[machine]["from_directory"])
+      if len(paths) != entry["amount"]:
+        self.logger.error("expected {} files for {} but got {} files: {}".format(entry["amount"], entry["path"], len(paths), paths))
+        errored = True
+      all_paths.append(paths)
+
+    if errored:
+      raise RuntimeError("cannot backup {} as sanity check failed. see error logs for details".format(machine))
+
+    for from_path in all_paths:
+      relative_absolute_path = self._get_relative_absolute_path(from_path, self.manifests[machine]["from_directory"])
+      to_path = relative_absolute_path.lstrip("/")
+      to_path = os.path.join(self.path, to_path, machine)
+      self.logger.info("copying {} to {}".format(from_path, to_path))
+      mkdir_p(os.path.dirname(to_path))
+      shutil.copy2(from_path, to_path)
+      os.chown(to_path, 0, 0)
+      os.chmod(to_path, int("0600"))
+
   def write_manifest_lock(self, config):
     manifest_locks = {}
     for name, fn in self._manifest_files():
@@ -57,7 +92,10 @@ class SynchronizedStore(BaseStore):
     return excluded_files
 
   def backup(self, config):
-    pass
+    self._backup_one_machine("_common")
+    machine = config.get("machine")
+    if machine:
+      self._backup_one_machine(machine)
 
   def restore(self, config):
     pass

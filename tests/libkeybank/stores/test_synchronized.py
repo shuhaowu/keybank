@@ -62,7 +62,7 @@ class TestSynchronizedStore(StoreTestCase):
         },
       ],
       "from_directory": self.host_path,
-      "user": getpass.getuser(),
+      "owner": getpass.getuser(),
       "group": getpass.getuser(),  # Maybe a bad assumption but whatever
     }
 
@@ -74,7 +74,7 @@ class TestSynchronizedStore(StoreTestCase):
         },
       ],
       "from_directory": self.host_path,
-      "user": getpass.getuser(),
+      "owner": getpass.getuser(),
       "group": getpass.getuser(),
     }
 
@@ -86,7 +86,7 @@ class TestSynchronizedStore(StoreTestCase):
         },
       ],
       "from_directory": self.host_path,
-      "user": getpass.getuser(),
+      "owner": getpass.getuser(),
       "group": getpass.getuser(),
     }
 

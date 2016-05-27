@@ -88,6 +88,9 @@ class TestArchivalStore(StoreTestCase):
     self.assertFalse(status.files_overall_status)
     self.assertEqual("removed", status.files_errors["/testfile"])
 
+  def test_nothing_to_commit(self):
+    raise NotImplementedError
+
   def assert_manifest_lock_json_is(self, m):
     with open("manifest.lock.json") as f:
       manifest = json.load(f)

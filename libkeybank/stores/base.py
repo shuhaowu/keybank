@@ -128,10 +128,11 @@ class BaseStore(object):
     return sum(map(len, changes.values())) > 0
 
   def _verify_git_repo(self, status):
-    status.git_repo_status, status.git_repo_error_messages = self.repo.fsck()
+    status.git_repo_status, git_repo_error_messages = self.repo.fsck()
+    status.git_repo_error_messages.append(git_repo_error_messages)
 
     if not status.git_repo_status:
-      self.logger.error("detected issue with git repo: %s", status.git_repo_error_messages)
+      self.logger.error("detected issue with git repo: %s", git_repo_error_messages)
 
     return status
 
@@ -236,7 +237,7 @@ class VerificationStatus(object):
     self.store = store
 
     self.git_repo_status = None
-    self.git_repo_error_messages = None
+    self.git_repo_error_messages = []
 
     self.files_overall_status = None
     self.files_errors = {}  # path => error info
@@ -249,3 +250,8 @@ class VerificationStatus(object):
 
   def is_good(self):
     return self.git_repo_status and self.files_overall_status and self.other_status
+
+  def merge(self, other):
+    self.git_repo_status = self.git_repo_status or other.git_repo_status
+    self.files_overall_status = self.files_overall_status or other.files_overall_status
+    self.other_status = self.other_status or other.other_status

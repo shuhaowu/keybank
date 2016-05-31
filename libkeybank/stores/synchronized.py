@@ -8,7 +8,7 @@ import shutil
 from pwd import getpwnam
 from grp import getgrnam
 
-from .base import BaseStore
+from .base import BaseStore, VerificationStatus
 from ..utils import mkdir_p
 
 
@@ -141,5 +141,9 @@ class SynchronizedStore(BaseStore):
 
   def verify(self):
     self._detect_substores()
+    status = VerificationStatus(self)
     for substore in self.substores.values():
-      status = substore.verify()
+      substatus = substore.verify()
+      status.merge(substatus)
+
+    return status
